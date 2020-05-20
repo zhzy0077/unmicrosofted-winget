@@ -15,6 +15,13 @@ jobs:
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
+      
+    - uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: 'latest'
+    
+    - name: Nuget restore
+      run: nuget restore src\AppInstallerCLI.sln
 
     - name: Build
       run: |
