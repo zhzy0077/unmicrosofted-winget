@@ -25,4 +25,7 @@ jobs:
 
     - name: Build
       run: |
-        msbuild -m src\AppInstallerCLI.sln
+        msbuild /p:Configuration=Release -m src\AppInstallerCLI.sln
+        
+    - name: Show
+      run: tree .
