@@ -28,9 +28,10 @@ jobs:
         msbuild -m -t:AppInstallerCLIPackage /p:Platform="x64" /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:Configuration=release src\AppInstallerCLI.sln
 
     - name: Load version
+      id: load_version
       run: |
         [xml]$manifest = Get-Content ".\src\AppInstallerCLIPackage\Package.appxmanifest"
-        $env:VERSION=$manifest.Package.Identity.Version
+        Write-Host "::set-output name=VERSION::$($manifest.Package.Identity.Version)"
 
     - name: Create Release
       id: create_release
@@ -38,8 +39,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.VERSION }}
-        release_name: Release ${{ env.VERSION }}
+        tag_name: ${{ steps.load_version.outputs.VERSION }}
+        release_name: Release ${{ steps.load_version.outputs.VERSION }}
         draft: false
         prerelease: false
 
