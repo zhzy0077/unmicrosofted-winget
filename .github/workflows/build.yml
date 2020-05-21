@@ -25,7 +25,7 @@ jobs:
 
     - name: Build
       run: |
-        msbuild -m -t:AppInstallerCLIPackage /p:Platform="x64" /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:Configuration=release
+        msbuild -m -t:AppInstallerCLIPackage /p:Platform="x64" /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:Configuration=release src\AppInstallerCLI.sln
 
     - name: Create Release
       uses: actions/create-release@v1
