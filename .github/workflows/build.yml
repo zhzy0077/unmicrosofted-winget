@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: 'microsoft/winget-cli'
+        
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.0
+      
+    - uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: 'latest'
+    
+    - name: Nuget restore
+      run: nuget restore src\AppInstallerCLI.sln
+
+    - name: Build
+      run: |
+        msbuild -m -t:AppInstallerCLIPackage /p:Platform="x64" /p:AppxBundle=Always /p:AppxBundlePlatforms="x64" /p:Configuration=release src\AppInstallerCLI.sln
+
+    - name: Load version
+      id: load_version
+      run: |
+        [xml]$manifest = Get-Content ".\src\AppInstallerCLIPackage\Package.appxmanifest"
+        Write-Host "::set-output name=VERSION::$($manifest.Package.Identity.Version)"
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.load_version.outputs.VERSION }}
+        release_name: Release ${{ steps.load_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: .\src\AppInstallerCLIPackage\bin\x64\Release\AppInstallerCLI\AppInstallerCLI.exe
+        asset_name: AppInstallerCLI.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset	
+      uses: actions/upload-release-asset@v1	
+      env:	
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}	
+      with:	
+        upload_url: ${{ steps.create_release.outputs.upload_url }}	
+        asset_path: .\src\AppInstallerCLIPackage\AppPackages\AppInstallerCLIPackage_0.0.2.0_Test\AppInstallerCLIPackage_0.0.2.0_x64.appxbundle	
+        asset_name: AppInstallerCLIPackage_0.0.2.0_x64.appxbundle	
+        asset_content_type: application/octet-stream 
