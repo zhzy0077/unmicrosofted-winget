@@ -46,13 +46,3 @@ jobs:
         asset_path: .\src\AppInstallerCLIPackage\bin\x64\Release\AppInstallerCLI\AppInstallerCLI.exe
         asset_name: AppInstallerCLI.exe
         asset_content_type: application/octet-stream
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: .\src\AppInstallerCLIPackage\AppPackages\AppInstallerCLIPackage_0.0.2.0_Test\AppInstallerCLIPackage_0.0.2.0_x64.appxbundle
-        asset_name: AppInstallerCLIPackage_0.0.2.0_x64.appxbundle
-        asset_content_type: application/octet-stream 
